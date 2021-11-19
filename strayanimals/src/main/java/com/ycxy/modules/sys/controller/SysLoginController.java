@@ -1,14 +1,21 @@
 package com.ycxy.modules.sys.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.ycxy.common.annotation.SysLog;
+import com.ycxy.common.utils.Constant;
 import com.ycxy.common.utils.R;
+import com.ycxy.common.validator.ValidatorUtils;
+import com.ycxy.common.validator.group.AddGroup;
+import com.ycxy.modules.sys.entity.SysRoleEntity;
 import com.ycxy.modules.sys.entity.SysUserEntity;
+import com.ycxy.modules.sys.entity.SysUserRoleEntity;
 import com.ycxy.modules.sys.form.SysLoginForm;
-import com.ycxy.modules.sys.service.SysCaptchaService;
-import com.ycxy.modules.sys.service.SysUserService;
-import com.ycxy.modules.sys.service.SysUserTokenService;
+import com.ycxy.modules.sys.service.*;
 import org.apache.commons.io.IOUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,6 +37,10 @@ import java.util.Map;
 public class SysLoginController extends AbstractController {
 	@Autowired
 	private SysUserService sysUserService;
+	@Autowired
+	private SysRoleService sysRoleService;
+	@Autowired
+	private SysUserRoleService sysUserRoleService;
 	@Autowired
 	private SysUserTokenService sysUserTokenService;
 	@Autowired
@@ -77,6 +88,28 @@ public class SysLoginController extends AbstractController {
 		//生成token，并保存到数据库
 		R r = sysUserTokenService.createToken(user.getUserId());
 		return r;
+	}
+
+	/**
+	 * 外部注册
+	 */
+	@PostMapping("/register")
+	@Transactional
+	public R register(@RequestBody SysUserEntity user){
+
+		user.setExternal(Constant.YesOrNo.YES.getValue());
+		user.setAdoptStatus(Constant.YesOrNo.NO.getValue());
+		user.setStatus(Constant.YesOrNo.YES.getValue());
+		sysUserService.saveUser(user);
+		final QueryWrapper<SysRoleEntity> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("role_name", "外部用户");
+		final SysRoleEntity sysRole = sysRoleService.getOne(queryWrapper);
+
+		SysUserRoleEntity userRole = new SysUserRoleEntity();
+		userRole.setRoleId(sysRole.getRoleId());
+		userRole.setUserId(user.getUserId());
+		sysUserRoleService.save(userRole);
+		return R.ok();
 	}
 
 

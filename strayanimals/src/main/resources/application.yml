@@ -7,7 +7,10 @@ server:
   port: 8080
   servlet:
     context-path: /stray-anmial
-
+upload:
+  uploadFolder: /D:/upload/
+    # 对外访问的资源路径
+  staticAccessPath: /upload/**
 spring:
 #   环境 dev|test|prod
   profiles:

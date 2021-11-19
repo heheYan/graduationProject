@@ -116,4 +116,24 @@ public class Constant {
         }
     }
 
+    public enum YesOrNo {
+        /**
+         * 是
+         */
+        YES(1),
+        /**
+         * 否
+         */
+        NO(0);
+
+        private int value;
+
+        YesOrNo(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+    }
 }

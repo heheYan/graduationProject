@@ -59,6 +59,16 @@ public class SysUserEntity implements Serializable {
 	private String mobile;
 
 	/**
+	 * 是否外部注册  0：否   1：是
+	 */
+	private Integer external;
+
+	/**
+	 * 领养资格  0：否   1：是
+	 */
+	private Integer adoptStatus;
+
+	/**
 	 * 状态  0：禁用   1：正常
 	 */
 	private Integer status;

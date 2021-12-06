@@ -20,7 +20,7 @@
         </el-form-item>
       </el-form>
     <span slot="footer" class="dialog-footer">
-        <el-button @click="visible = false">取消</el-button>
+        <el-button @click="cancel()">取消</el-button>
         <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
       </span>
   </div>
@@ -118,7 +118,7 @@
                   type: 'success',
                   duration: 1500,
                   onClose: () => {
-                    this.$router.push('/')
+                    this.cancel()
                   }
                 })
               } else {
@@ -127,6 +127,9 @@
             })
           }
         })
+      },
+      cancel () {
+        this.$router.push('/')
       }
     }
   }

@@ -2,7 +2,6 @@
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
         <el-button v-if="isAuth('animal:animaltype:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-      </el-form-item>
     </el-form>
     <el-table
       :data="dataList"
@@ -11,7 +10,6 @@
       default-expand-all
       :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
       v-loading="dataListLoading"
-      @selection-change="selectionChangeHandle"
       style="width: 100%;">
       <el-table-column
         prop="name"
@@ -93,21 +91,6 @@
           }
           this.dataListLoading = false
         })
-      },
-      // 每页数
-      sizeChangeHandle (val) {
-        this.pageSize = val
-        this.pageIndex = 1
-        this.getDataList()
-      },
-      // 当前页
-      currentChangeHandle (val) {
-        this.pageIndex = val
-        this.getDataList()
-      },
-      // 多选
-      selectionChangeHandle (val) {
-        this.dataListSelections = val
       },
       // 新增 / 修改
       addOrUpdateHandle (id) {

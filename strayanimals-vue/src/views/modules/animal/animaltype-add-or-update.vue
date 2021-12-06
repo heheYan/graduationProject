@@ -38,13 +38,13 @@
 <script>
 import { treeDataTranslate } from '@/utils'
 export default {
-  data() {
+  data () {
     return {
       visible: false,
       dataForm: {
         id: 0,
         name: '',
-        parentId: '',
+        parentId: 0,
         parentName: ''
       },
       typeList: [],
@@ -56,14 +56,14 @@ export default {
         name: [
           {required: true, message: '名称不能为空', trigger: 'blur'}
         ],
-        parentId: [
+        parentName: [
           {required: true, message: '上级分类不能为空', trigger: 'change'}
         ]
       }
     }
   },
   methods: {
-    init(id) {
+    init (id) {
       this.dataForm.id = id || 0
       this.$http({
         url: this.$http.adornUrl('/animal/animaltype/select'),
@@ -75,41 +75,39 @@ export default {
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
-        }).then(() => {
-          if (!this.dataForm.id) {
-            // 新增
-            this.typeListTreeSetCurrentNode()
-          } else {
-            this.$http({
-              url: this.$http.adornUrl(`/animal/animaltype/info/${this.dataForm.id}`),
-              method: 'get',
-              params: this.$http.adornParams()
-            }).then(({data}) => {
-              if (data && data.code === 0) {
-                this.dataForm.name = data.animalType.name
-                this.dataForm.parentId = data.animalType.parentId
-                this.dataForm.parentName = data.animalType.parentName
-                this.typeListTreeSetCurrentNode()
-              }
-            })
-          }
         })
+      }).then(() => {
+        if (!this.dataForm.id) {
+          // 新增
+          this.typeListTreeSetCurrentNode()
+        } else {
+          this.$http({
+            url: this.$http.adornUrl(`/animal/animaltype/info/${this.dataForm.id}`),
+            method: 'get',
+            params: this.$http.adornParams()
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              this.dataForm.name = data.animalType.name
+              this.dataForm.parentId = data.animalType.parentId
+              this.dataForm.parentName = data.animalType.parentName
+              this.typeListTreeSetCurrentNode()
+            }
+          })
+        }
       })
     },
     // 菜单树选中
-    typeListTreeCurrentChangeHandle(data, node) {
+    typeListTreeCurrentChangeHandle (data, node) {
       this.dataForm.parentId = data.id
       this.dataForm.parentName = data.name
-    }
-    ,
+    },
     // 父类树设置当前选中节点
-    typeListTreeSetCurrentNode() {
+    typeListTreeSetCurrentNode () {
       this.$refs.typeListTree.setCurrentKey(this.dataForm.parentId)
       this.dataForm.parentName = (this.$refs.typeListTree.getCurrentNode() || {})['name']
-    }
-    ,
+    },
     // 表单提交
-    dataFormSubmit() {
+    dataFormSubmit () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.$http({

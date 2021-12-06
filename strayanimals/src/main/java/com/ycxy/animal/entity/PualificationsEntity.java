@@ -3,13 +3,12 @@ package com.ycxy.animal.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-
-import java.io.Serializable;
-import java.util.Date;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 
@@ -19,8 +18,8 @@ import lombok.Data;
  * @date 2021-11-09 23:13:39
  */
 @Data
-@TableName("deal_instance")
-public class DealInstanceEntity implements Serializable {
+@TableName("pualifications")
+public class PualificationsEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -30,48 +29,52 @@ public class DealInstanceEntity implements Serializable {
 	@JsonSerialize(using = ToStringSerializer.class)
 	private Long id;
 	/**
-	 * 
+	 * 昵称
 	 */
-	private Long animalId;
+	private String name;
 	/**
-	 * 操作人id
+	 * 真实姓名
 	 */
-	private Long opId;
+	private String realName;
 	/**
-	 * 
+	 * 联系电话
 	 */
-	private String opName;
+	private String mobile;
 	/**
-	 * 环节名称
+	 * 申请人id
 	 */
-	private String workitem;
+	private Long userId;
 	/**
-	 * 上一步
+	 * 住址
 	 */
-	private Long preWorkitemId;
+	private String address;
 	/**
-	 * 当前状态
+	 * 审核人员id
+	 */
+	private Long checkId;
+	/**
+	 * 审核人
+	 */
+	private String checkName;
+	/**
+	 * 审核时间
+	 */
+	private Date checkDate;
+	/**
+	 * 审核状态，0：待审核，1：审核通过，2：审核未通过
 	 */
 	private Integer status;
 	/**
-	 * 处理意见
+	 * 理由
 	 */
-	private String opinion;
+	private String reason;
 	/**
-	 * 标题
+	 * 备注
 	 */
-	private String title;
+	private String remark;
 	/**
-	 * 接收时间
+	 * 提交时间
 	 */
-	private Date startDate;
-	/**
-	 * 处理时间
-	 */
-	private Date opDate;
-	/**
-	 * 处理地址
-	 */
-	private String handleUrl;
+	private Date createDate;
 
 }

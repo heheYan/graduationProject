@@ -33,19 +33,23 @@
         prop="name"
         header-align="center"
         align="center"
-        label="动物名称">
+        label="动物名称"
+        width="100">
       </el-table-column>
       <el-table-column
-        prop="imgurl"
         header-align="center"
         align="center"
         label="图片">
+        <template slot-scope="scope">
+          <img v-if="scope.row.imgurl" style="width:120px;height:80px;border:none;" :src="scope.row.imgurl"  alt=""/>
+        </template>
       </el-table-column>
       <el-table-column
-        prop="type"
+        prop="typename"
         header-align="center"
         align="center"
-        label="种类">
+        label="种类"
+        width="100">
       </el-table-column>
       <el-table-column
         prop="registerName"
@@ -63,24 +67,29 @@
         prop="status"
         header-align="center"
         align="center"
-        label="状态">
+        label="状态"
+        width="150"
+        :formatter="statusFormatter">
       </el-table-column>
       <el-table-column
         prop="isAdopt"
         header-align="center"
         align="center"
-        label="领养状态">
+        label="领养状态"
+        width="150"
+        :formatter="adoptFormatter">
       </el-table-column>
-
       <el-table-column
         fixed="right"
         header-align="center"
         align="center"
-        width="150"
+        width="200"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button v-if="isAuth('animal:animalinfo:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button v-if="isAuth('animal:animalinfo:deal')" type="text" size="small" @click="dealHandle(scope.row.id)">处理</el-button>
+          <el-button type="text" size="small" @click="detail(scope.row.id)">查看</el-button>
+          <el-button v-if="isAuth('animal:animalinfo:delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -95,11 +104,14 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <!-- 弹窗, 新增 / 修改 -->
+    <deal v-if="dealVisible" ref="deal" @refreshDataList="getDataList"></deal>
   </div>
 </template>
 
 <script>
   import AddOrUpdate from './animalinfo-add-or-update'
+  import Deal from './dealinstance-add-or-update'
   export default {
     data () {
       return {
@@ -112,11 +124,13 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        dealVisible: false
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      Deal
     },
     activated () {
       this.getDataList()
@@ -131,7 +145,8 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'key': this.dataForm.key,
+            'id': this.$route.query.id
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -166,6 +181,13 @@
           this.$refs.addOrUpdate.init(id)
         })
       },
+      // 新增 / 修改
+      dealHandle (id) {
+        this.dealVisible = true
+        this.$nextTick(() => {
+          this.$refs.deal.init(id)
+        })
+      },
       // 删除
       deleteHandle (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
@@ -195,6 +217,22 @@
             }
           })
         })
+      },
+      statusFormatter (row, column) {
+        if (row.status === '1') {
+          return '已清洗'
+        } else if (row.status === '2') {
+          return '已防疫'
+        } else {
+          return '已登记'
+        }
+      },
+      adoptFormatter (row, column) {
+        if (row.isAdopt === '1') {
+          return '已领养'
+        } else {
+          return '未领养'
+        }
       }
     }
   }

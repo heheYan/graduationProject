@@ -11,6 +11,7 @@ import com.ycxy.common.utils.Query;
 import com.ycxy.animal.dao.AnimalInfoDao;
 import com.ycxy.animal.entity.AnimalInfoEntity;
 import com.ycxy.animal.service.AnimalInfoService;
+import org.springframework.util.StringUtils;
 
 
 @Service("animalInfoService")
@@ -18,9 +19,18 @@ public class AnimalInfoServiceImpl extends ServiceImpl<AnimalInfoDao, AnimalInfo
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        QueryWrapper<AnimalInfoEntity> wrapper = new QueryWrapper<>();
+        if (!StringUtils.isEmpty(params.get("key"))) {
+            wrapper.like("name", params.get("key"));
+        }
+        if (!StringUtils.isEmpty(params.get("id"))) {
+            wrapper.eq("id", params.get("id"));
+        }
+
+
         IPage<AnimalInfoEntity> page = this.page(
                 new Query<AnimalInfoEntity>().getPage(params),
-                new QueryWrapper<AnimalInfoEntity>()
+                wrapper
         );
 
         return new PageUtils(page);

@@ -37,7 +37,7 @@ public class AnimalTypeController extends AbstractController {
     @RequestMapping("/list")
     @RequiresPermissions("animal:animaltype:list")
     public R list(){
-        List<AnimalTypeEntity> animalTypeEntities = animalTypeService.listByParentId(1L);
+        List<AnimalTypeEntity> animalTypeEntities = animalTypeService.listByParentId(0L);
         return R.ok().put("data", animalTypeEntities);
     }
 
@@ -47,13 +47,13 @@ public class AnimalTypeController extends AbstractController {
     @GetMapping("/select")
     public R select(){
         //查询列表数据
-        List<AnimalTypeEntity> typeList = animalTypeService.listByParentId(1L);
+        List<AnimalTypeEntity> typeList = animalTypeService.listByParentId(0L);
 
         //添加顶级菜单
         AnimalTypeEntity root = new AnimalTypeEntity();
-        root.setId(1L);
+        root.setId(0L);
         root.setName("顶级分类");
-        root.setParentId(0L);
+        root.setParentId(-1L);
         typeList.add(root);
 
         return R.ok().put("typeList", typeList);

@@ -6,6 +6,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 
 /**
@@ -23,7 +26,8 @@ public class AnimalInfoEntity implements Serializable {
 	/**
 	 * 
 	 */
-	@TableId(type = IdType.INPUT)
+	@TableId(type = IdType.ASSIGN_ID)
+	@JsonSerialize(using = ToStringSerializer.class)
 	private Long id;
 	/**
 	 * 
@@ -41,6 +45,10 @@ public class AnimalInfoEntity implements Serializable {
 	 * 
 	 */
 	private Long type;
+	/**
+	 *
+	 */
+	private String typename;
 	/**
 	 * 登记入库人员
 	 */

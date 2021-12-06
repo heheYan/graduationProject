@@ -1,5 +1,6 @@
 package com.ycxy.modules.sys.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ycxy.common.utils.MapUtils;
 import com.ycxy.modules.sys.dao.SysUserRoleDao;
@@ -46,5 +47,17 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleDao, SysUserR
 	@Override
 	public int deleteBatch(Long[] roleIds){
 		return baseMapper.deleteBatch(roleIds);
+	}
+
+	@Override
+	public Boolean isOrganUser(Long userId) {
+		LambdaQueryWrapper<SysUserRoleEntity> wrapper = new LambdaQueryWrapper<>();
+		wrapper.eq(SysUserRoleEntity::getUserId, userId);
+		wrapper.and(q -> {
+			q.eq(SysUserRoleEntity::getRoleId, 1)
+					.or()
+					.eq(SysUserRoleEntity::getRoleId, 1);
+		});
+		return !baseMapper.selectList(wrapper).isEmpty();
 	}
 }

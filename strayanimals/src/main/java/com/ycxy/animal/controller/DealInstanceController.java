@@ -3,6 +3,10 @@ package com.ycxy.animal.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.ycxy.modules.sys.controller.AbstractController;
+import com.ycxy.modules.sys.entity.SysUserEntity;
+import com.ycxy.modules.sys.service.SysUserRoleService;
+import com.ycxy.modules.sys.service.SysUserService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,28 +21,29 @@ import com.ycxy.common.utils.PageUtils;
 import com.ycxy.common.utils.R;
 
 
-
 /**
- * 
- *
  * @author Student
  * @email Student@ycxy.com
  * @date 2021-11-09 23:13:39
  */
 @RestController
 @RequestMapping("/animal/dealinstance")
-public class DealInstanceController {
+public class DealInstanceController extends AbstractController {
     @Autowired
     private DealInstanceService dealInstanceService;
+    @Autowired
+    private SysUserRoleService sysUserRoleService;
 
     /**
      * 列表
      */
     @RequestMapping("/list")
-    @RequiresPermissions("animal:dealinstance:list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = dealInstanceService.queryPage(params);
-
+    public R list(@RequestParam Map<String, Object> params) {
+        // 非外部角色用户可查看列表
+        PageUtils page = null;
+        if (sysUserRoleService.isOrganUser(getUserId())) {
+            page = dealInstanceService.queryPage(params);
+        }
         return R.ok().put("page", page);
     }
 
@@ -47,9 +52,8 @@ public class DealInstanceController {
      * 信息
      */
     @RequestMapping("/info/{id}")
-    @RequiresPermissions("animal:dealinstance:info")
-    public R info(@PathVariable("id") Long id){
-		DealInstanceEntity dealInstance = dealInstanceService.getById(id);
+    public R info(@PathVariable("id") Long id) {
+        DealInstanceEntity dealInstance = dealInstanceService.getById(id);
 
         return R.ok().put("dealInstance", dealInstance);
     }
@@ -58,9 +62,8 @@ public class DealInstanceController {
      * 保存
      */
     @RequestMapping("/save")
-    @RequiresPermissions("animal:dealinstance:save")
-    public R save(@RequestBody DealInstanceEntity dealInstance){
-		dealInstanceService.save(dealInstance);
+    public R save(@RequestBody DealInstanceEntity dealInstance) {
+        dealInstanceService.save(dealInstance);
 
         return R.ok();
     }
@@ -69,9 +72,8 @@ public class DealInstanceController {
      * 修改
      */
     @RequestMapping("/update")
-    @RequiresPermissions("animal:dealinstance:update")
-    public R update(@RequestBody DealInstanceEntity dealInstance){
-		dealInstanceService.updateById(dealInstance);
+    public R update(@RequestBody DealInstanceEntity dealInstance) {
+        dealInstanceService.updateById(dealInstance);
 
         return R.ok();
     }
@@ -80,9 +82,8 @@ public class DealInstanceController {
      * 删除
      */
     @RequestMapping("/delete")
-    @RequiresPermissions("animal:dealinstance:delete")
-    public R delete(@RequestBody Long[] ids){
-		dealInstanceService.removeByIds(Arrays.asList(ids));
+    public R delete(@RequestBody Long[] ids) {
+        dealInstanceService.removeByIds(Arrays.asList(ids));
 
         return R.ok();
     }

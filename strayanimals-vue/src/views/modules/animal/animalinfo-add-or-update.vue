@@ -9,9 +9,24 @@
         <el-input v-model="dataForm.name" placeholder="请输入动物名称"></el-input>
       </el-form-item>
       <el-form-item label="所属类型" prop="type">
-        <el-input v-model="dataForm.type" placeholder=""></el-input>
+        <el-popover
+          ref="typeListPopover"
+          placement="bottom-start"
+          trigger="click">
+          <el-tree
+            :data="typeList"
+            :props="typeListTreeProps"
+            node-key="id"
+            ref="typeListTree"
+            @current-change="typeListTreeCurrentChangeHandle"
+            :default-expand-all="true"
+            :highlight-current="true"
+            :expand-on-click-node="false">
+          </el-tree>
+        </el-popover>
+        <el-input v-model="dataForm.typename" v-popover:typeListPopover :readonly="true" placeholder="请选择所属类型" ></el-input>
       </el-form-item>
-      <el-form-item label="照片" prop="type">
+      <el-form-item ref="uploadElement" label="照片" prop="imgurl">
         <el-upload
           class="upload-demo"
           :action="uploadUrl"
@@ -20,6 +35,7 @@
           :limit="1"
           :on-exceed="handleExceed"
           :on-remove="handleRemove"
+          :on-success="handleSuccess"
           list-type="picture"
           :file-list="fileList">
           <el-button size="small" type="primary">点击上传</el-button>
@@ -35,6 +51,7 @@
 </template>
 
 <script>
+import { treeDataTranslate } from '@/utils'
 export default {
   data () {
     return {
@@ -44,54 +61,24 @@ export default {
       dataForm: {
         id: 0,
         name: '',
-        icon: '',
         imgurl: '',
-        type: '',
-        register: '',
-        registerName: '',
-        registerDate: '',
-        status: '',
-        isAdopt: '',
-        adopter: '',
-        adopterName: '',
-        adoptDate: ''
+        type: 1,
+        typename: ''
+      },
+      typeList: [],
+      typeListTreeProps: {
+        label: 'name',
+        children: 'children'
       },
       dataRule: {
         name: [
           {required: true, message: '不能为空', trigger: 'blur'}
         ],
-        icon: [
-          {required: true, message: '不能为空', trigger: 'blur'}
-        ],
         imgurl: [
-          {required: true, message: '不能为空', trigger: 'blur'}
+          {required: true, message: '请上传图片', trigger: 'blur'}
         ],
-        type: [
-          {required: true, message: '不能为空', trigger: 'blur'}
-        ],
-        register: [
-          {required: true, message: '登记入库人员不能为空', trigger: 'blur'}
-        ],
-        registerName: [
-          {required: true, message: '不能为空', trigger: 'blur'}
-        ],
-        registerDate: [
-          {required: true, message: '不能为空', trigger: 'blur'}
-        ],
-        status: [
-          {required: true, message: '动物状态，0：初始登记，1：已清洗，2：已防疫不能为空', trigger: 'blur'}
-        ],
-        isAdopt: [
-          {required: true, message: '是否被领养，0：否，1：是不能为空', trigger: 'blur'}
-        ],
-        adopter: [
-          {required: true, message: '领养人不能为空', trigger: 'blur'}
-        ],
-        adopterName: [
-          {required: true, message: '不能为空', trigger: 'blur'}
-        ],
-        adoptDate: [
-          {required: true, message: '领养时间不能为空', trigger: 'blur'}
+        typeName: [
+          {required: true, message: '所属类型不能为空', trigger: 'change'}
         ]
       }
     }
@@ -106,6 +93,14 @@ export default {
   methods: {
     init (id) {
       this.dataForm.id = id || 0
+      this.$http({
+        url: this.$http.adornUrl('/animal/animaltype/select'),
+        method: 'get',
+        params: this.$http.adornParams()
+      }).then(({data}) => {
+        this.typeList = treeDataTranslate(data.typeList, 'id')
+      })
+      this.fileList = []
       this.visible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].resetFields()
@@ -117,21 +112,30 @@ export default {
           }).then(({data}) => {
             if (data && data.code === 0) {
               this.dataForm.name = data.animalInfo.name
-              this.dataForm.icon = data.animalInfo.icon
               this.dataForm.imgurl = data.animalInfo.imgurl
               this.dataForm.type = data.animalInfo.type
-              this.dataForm.register = data.animalInfo.register
-              this.dataForm.registerName = data.animalInfo.registerName
-              this.dataForm.registerDate = data.animalInfo.registerDate
-              this.dataForm.status = data.animalInfo.status
-              this.dataForm.isAdopt = data.animalInfo.isAdopt
-              this.dataForm.adopter = data.animalInfo.adopter
-              this.dataForm.adopterName = data.animalInfo.adopterName
-              this.dataForm.adoptDate = data.animalInfo.adoptDate
+              this.dataForm.typename = data.animalInfo.typename
+              if (data.animalInfo.imgurl) {
+                this.fileList.push({'url': data.animalInfo.imgurl})
+              }
             }
           })
         }
       })
+    },
+    // 菜单树选中
+    typeListTreeCurrentChangeHandle (data, node) {
+      if (data.id === 0) {
+        this.$message.warning('顶级节点不能选择')
+      } else {
+        this.dataForm.type = data.id
+        this.dataForm.typename = data.name
+      }
+    },
+    // 父类树设置当前选中节点
+    typeListTreeSetCurrentNode () {
+      this.$refs.typeListTree.setCurrentKey(this.dataForm.parentId)
+      this.dataForm.parentName = (this.$refs.typeListTree.getCurrentNode() || {})['name']
     },
     // 表单提交
     dataFormSubmit () {
@@ -143,17 +147,9 @@ export default {
             data: this.$http.adornData({
               'id': this.dataForm.id || undefined,
               'name': this.dataForm.name,
-              'icon': this.dataForm.icon,
               'imgurl': this.dataForm.imgurl,
               'type': this.dataForm.type,
-              'register': this.dataForm.register,
-              'registerName': this.dataForm.registerName,
-              'registerDate': this.dataForm.registerDate,
-              'status': this.dataForm.status,
-              'isAdopt': this.dataForm.isAdopt,
-              'adopter': this.dataForm.adopter,
-              'adopterName': this.dataForm.adopterName,
-              'adoptDate': this.dataForm.adoptDate
+              'typename': this.dataForm.typename
             })
           }).then(({data}) => {
             if (data && data.code === 0) {
@@ -173,13 +169,19 @@ export default {
         }
       })
     },
+    handleSuccess (data) {
+      if (data && data.code === 0) {
+        this.dataForm.imgurl = data.filepath
+        this.$message.success('上传成功')
+        this.$refs.uploadElement.clearValidate()
+      }
+    },
     handleExceed (files, fileList) {
-      console.log(files, fileList)
       this.$message.warning('只能选择一张照片')
     },
     handleRemove (files, fileList) {
-      console.log(files, fileList)
-      this.$message.warning('移除')
+      this.$message.warning('移除成功')
+      this.dataForm.imgurl = ''
     }
   }
 }

@@ -136,14 +136,10 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.$http({
-            url: this.$http.adornUrl(`/animal/animalinfo/${!this.dataForm.id ? 'save' : 'update'}`),
+            url: this.$http.adornUrl(`/animal/animalinfo/deal`),
             method: 'post',
             data: this.$http.adornData({
-              'id': this.dataForm.id || undefined,
-              'name': this.dataForm.name,
-              'imgurl': this.dataForm.imgurl,
-              'type': this.dataForm.type,
-              'typename': this.dataForm.typename
+              'id': this.dataForm.id
             })
           }).then(({data}) => {
             if (data && data.code === 0) {

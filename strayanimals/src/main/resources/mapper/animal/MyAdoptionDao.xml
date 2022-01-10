@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ycxy.animal.dao.MyAdoptionDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.ycxy.animal.entity.MyAdoptionEntity" id="myAdoptionMap">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="animalId" column="animal_id"/>
+        <result property="animalName" column="animal_name"/>
+        <result property="applyDate" column="apply_date"/>
+        <result property="reason" column="reason"/>
+        <result property="status" column="status"/>
+        <result property="status" column="status"/>
+        <result property="accepter" column="accepter"/>
+        <result property="accepterName" column="accepter_name"/>
+        <result property="acceptDate" column="acceptDate"/>
+        <result property="opinion" column="opinion"/>
+    </resultMap>
+
+
+</mapper>

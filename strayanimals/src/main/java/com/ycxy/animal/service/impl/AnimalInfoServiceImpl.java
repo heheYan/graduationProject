@@ -1,5 +1,6 @@
 package com.ycxy.animal.service.impl;
 
+import com.ycxy.common.utils.Constant;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -28,6 +29,28 @@ public class AnimalInfoServiceImpl extends ServiceImpl<AnimalInfoDao, AnimalInfo
         }
 
 
+        IPage<AnimalInfoEntity> page = this.page(
+                new Query<AnimalInfoEntity>().getPage(params),
+                wrapper
+        );
+
+        return new PageUtils(page);
+    }
+
+    @Override
+    public PageUtils canAdoptPage(Map<String, Object> params) {
+        QueryWrapper<AnimalInfoEntity> wrapper = new QueryWrapper<>();
+        if (!StringUtils.isEmpty(params.get("key"))) {
+            wrapper.like("name", params.get("key"));
+        }
+        if (!StringUtils.isEmpty(params.get("id"))) {
+            wrapper.eq("id", params.get("id"));
+        }
+
+        // 未被领养
+        wrapper.eq("is_adopt", Constant.YesOrNo.NO);
+        // 已防疫状态
+        wrapper.eq("status", Constant.INT_TWO);
         IPage<AnimalInfoEntity> page = this.page(
                 new Query<AnimalInfoEntity>().getPage(params),
                 wrapper

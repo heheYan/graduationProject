@@ -1,8 +1,10 @@
 package com.ycxy.animal.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import com.ycxy.common.utils.Constant;
 import com.ycxy.modules.sys.controller.AbstractController;
 import com.ycxy.modules.sys.entity.SysUserEntity;
 import com.ycxy.modules.sys.service.SysUserRoleService;
@@ -39,6 +41,21 @@ public class DealInstanceController extends AbstractController {
      */
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params) {
+        // 非外部角色用户可查看列表
+        PageUtils page = null;
+        if (sysUserRoleService.isOrganUser(getUserId())) {
+            page = dealInstanceService.queryPage(params);
+            // 首页只展示10条
+            page.setCurrPage(0);
+            page.setPageSize(10);
+        }
+        return R.ok().put("page", page);
+    }
+    /**
+     * 列表
+     */
+    @RequestMapping("/handleList")
+    public R handleList(@RequestParam Map<String, Object> params) {
         // 非外部角色用户可查看列表
         PageUtils page = null;
         if (sysUserRoleService.isOrganUser(getUserId())) {
@@ -86,6 +103,15 @@ public class DealInstanceController extends AbstractController {
         dealInstanceService.removeByIds(Arrays.asList(ids));
 
         return R.ok();
+    }
+
+    /**
+     * 处理流程
+     */
+    @RequestMapping("/list/{animalId}")
+    public R getListByAnimalId(@PathVariable("animalId") Long id) {
+        List<DealInstanceEntity> list = dealInstanceService.listByAnimalId(id);
+        return R.ok().put("dataList", list);
     }
 
 }

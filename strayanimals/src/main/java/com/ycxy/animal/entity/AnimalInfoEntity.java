@@ -78,6 +78,10 @@ public class AnimalInfoEntity implements Serializable {
 	 */
 	private String adopterName;
 	/**
+	 * 描述
+	 */
+	private String description;
+	/**
 	 * 领养时间
 	 */
 	private Date adoptDate;

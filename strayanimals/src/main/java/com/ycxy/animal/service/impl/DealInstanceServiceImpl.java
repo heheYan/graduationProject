@@ -2,6 +2,7 @@ package com.ycxy.animal.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ycxy.common.utils.Constant;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -46,6 +47,33 @@ public class DealInstanceServiceImpl extends ServiceImpl<DealInstanceDao, DealIn
             wrapper.eq(DealInstanceEntity::getAnimalId, animalId);
             baseMapper.delete(wrapper);
         }
+    }
+
+    /**
+     * 获取当前活动信息
+     *
+     * @param id 动物id
+     */
+    @Override
+    public DealInstanceEntity getCurrentStep(Long id) {
+        LambdaQueryWrapper<DealInstanceEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(DealInstanceEntity::getAnimalId, id);
+        wrapper.eq(DealInstanceEntity::getStatus, 0);
+        return baseMapper.selectOne(wrapper);
+    }
+
+    /**
+     * 根据animalid获取流转记录
+     *
+     * @param id 动物id
+     * @return
+     */
+    @Override
+    public List<DealInstanceEntity> listByAnimalId(Long id) {
+        LambdaQueryWrapper<DealInstanceEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(DealInstanceEntity::getAnimalId, id);
+        wrapper.orderByAsc(DealInstanceEntity::getId);
+        return baseMapper.selectList(wrapper);
     }
 
 }

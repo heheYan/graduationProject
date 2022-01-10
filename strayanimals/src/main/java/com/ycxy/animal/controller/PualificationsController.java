@@ -4,6 +4,7 @@ import com.ycxy.animal.entity.AnimalInfoEntity;
 import com.ycxy.animal.entity.PualificationsEntity;
 import com.ycxy.animal.service.AnimalInfoService;
 import com.ycxy.animal.service.PualificationsService;
+import com.ycxy.common.utils.Constant;
 import com.ycxy.common.utils.PageUtils;
 import com.ycxy.common.utils.R;
 import com.ycxy.modules.sys.controller.AbstractController;
@@ -49,7 +50,7 @@ public class PualificationsController extends AbstractController {
      */
     @RequestMapping("/detail")
     public R detail(){
-        final SysUserEntity sysUser = sysUserService.getById(getUserId());
+        final SysUserEntity sysUser = getUser();
         PualificationsEntity pualifications = pualificationsService.findByUserId(getUserId());
         if (pualifications == null) {
             pualifications = new PualificationsEntity();
@@ -61,6 +62,26 @@ public class PualificationsController extends AbstractController {
             pualificationsService.save(pualifications);
         }
         return R.ok().put("data", pualifications);
+    }
+
+    /**
+     * 查询
+     */
+    @RequestMapping("/detail/{userId}")
+    public R detail(@PathVariable("userId") Long userId){
+        PualificationsEntity pualifications = pualificationsService.findByUserId(userId);
+
+        return R.ok().put("data", pualifications);
+    }
+
+
+    /**
+     * 查询是否具有领养权限
+     */
+    @RequestMapping("/hasAdoptAuthority")
+    public R hasAdoptAuthority(){
+        final SysUserEntity user = getUser();
+        return R.ok().put("data", Constant.INT_ONE.equals(user.getAdoptStatus()));
     }
 
     /**

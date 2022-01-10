@@ -1,58 +1,96 @@
 <template>
   <div class="mod-config">
-<!--    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
         <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('animal:dealinstance:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('animal:dealinstance:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
-    </el-form>-->
+    </el-form>
     <el-table
       :data="dataList"
       border
       v-loading="dataListLoading"
-      @selection-change="selectionChangeHandle"
       style="width: 100%;">
-<!--      <el-table-column
-        type="selection"
-        header-align="center"
-        align="center"
-        width="50">
-      </el-table-column>-->
-
       <el-table-column
-        prop="title"
+        prop="id"
         header-align="center"
         align="center"
-        label="标题">
+        label="ID"
+        :show-overflow-tooltip="true"
+        width="100">
       </el-table-column>
       <el-table-column
-        prop="workitem"
+        prop="animalInfo.name"
         header-align="center"
         align="center"
-        label="环节名称">
+        label="动物名称"
+        width="100">
       </el-table-column>
-
       <el-table-column
-        prop="startDate"
+        prop="animalInfo.description"
         header-align="center"
         align="center"
-        label="接收时间">
+        label="动物简介"
+        :show-overflow-tooltip="true"
+        width="180">
       </el-table-column>
-
+      <el-table-column
+        header-align="center"
+        align="center"
+        label="图片">
+        <template slot-scope="scope">
+          <viewer>
+            <img
+              :src="scope.row.animalInfo.imgurl"
+              style="width: 120px;height: 80px; border:none;cursor:pointer">
+          </viewer>
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="animalInfo.typename"
+        header-align="center"
+        align="center"
+        label="种类"
+        width="100">
+      </el-table-column>
+      <el-table-column
+        prop="animalInfo.registerName"
+        header-align="center"
+        align="center"
+        label="登记人员">
+      </el-table-column>
+      <el-table-column
+        prop="animalInfo.registerDate"
+        header-align="center"
+        align="center"
+        label="登记时间"
+        width="180">
+      </el-table-column>
+      <el-table-column
+        prop="applyDate"
+        header-align="center"
+        align="center"
+        label="申请时间"
+        width="180">
+      </el-table-column>
+      <el-table-column
+        prop="status"
+        header-align="center"
+        align="center"
+        label="审核状态"
+        width="150"
+        :formatter="adoptStatusFormatter">
+      </el-table-column>
       <el-table-column
         fixed="right"
         header-align="center"
         align="center"
-        width="150"
+        width="120"
         label="操作">
         <template slot-scope="scope">
-<!--          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>-->
-          <el-button type="text" size="small" @click="$router.push(scope.row.handleUrl)">处理</el-button>
+          <el-button type="text" size="small" @click="dealLineHandle(scope.row.animalInfo.id)">查看流程</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -65,13 +103,12 @@
       :total="totalPage"
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
-    <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <dealline v-if="deallineVisible" ref="dealline" @refreshDataList="getDataList"></dealline>
   </div>
 </template>
 
 <script>
-  import AddOrUpdate from './dealinstance-add-or-update'
+  import Dealline from './dealline'
   export default {
     data () {
       return {
@@ -84,11 +121,12 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        deallineVisible: false,
+        fileList: []
       }
     },
     components: {
-      AddOrUpdate
+      Dealline
     },
     activated () {
       this.getDataList()
@@ -98,7 +136,7 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/animal/dealinstance/list'),
+          url: this.$http.adornUrl('/myAdoption/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -127,45 +165,19 @@
         this.pageIndex = val
         this.getDataList()
       },
-      // 多选
-      selectionChangeHandle (val) {
-        this.dataListSelections = val
+      adoptStatusFormatter (row, column) {
+        if (row.status === 1) {
+          return '审核通过'
+        } else if (row.status === 2) {
+          return '审核未通过'
+        } else {
+          return '审核中'
+        }
       },
-      // 新增 / 修改
-      addOrUpdateHandle (id) {
-        this.addOrUpdateVisible = true
+      dealLineHandle (id) {
+        this.deallineVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id)
-        })
-      },
-      // 删除
-      deleteHandle (id) {
-        var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
-        })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.$http({
-            url: this.$http.adornUrl('/animal/dealinstance/delete'),
-            method: 'post',
-            data: this.$http.adornData(ids, false)
-          }).then(({data}) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '操作成功',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.getDataList()
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
-          })
+          this.$refs.dealline.init(id)
         })
       }
     }

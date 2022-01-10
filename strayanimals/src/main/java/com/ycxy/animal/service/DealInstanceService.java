@@ -21,4 +21,18 @@ public interface DealInstanceService extends IService<DealInstanceEntity> {
     DealInstanceEntity getByAnimalId(Long animalId);
 
     void removeByAnimalIds(List<Long> animalIds);
+
+    /**
+     * 获取当前活动信息
+     *
+     * @param id    动物id
+     */
+    DealInstanceEntity getCurrentStep(Long id);
+
+    /**
+     * 根据animalid获取流转记录
+     * @param id    动物id
+     * @return
+     */
+    List<DealInstanceEntity> listByAnimalId(Long id);
 }

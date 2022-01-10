@@ -6,11 +6,13 @@ import java.util.Map;
 
 import com.ycxy.animal.entity.DealInstanceEntity;
 import com.ycxy.animal.service.DealInstanceService;
+import com.ycxy.common.utils.Constant;
 import com.ycxy.modules.sys.controller.AbstractController;
 import com.ycxy.modules.sys.entity.SysUserEntity;
 import com.ycxy.modules.sys.service.SysUserService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +45,17 @@ public class AnimalInfoController extends AbstractController {
     @RequiresPermissions("animal:animalinfo:list")
     public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = animalInfoService.queryPage(params);
+
+        return R.ok().put("page", page);
+    }
+
+
+    /**
+     * 可领养列表
+     */
+    @RequestMapping("/canAdoptList")
+    public R canAdoptList(@RequestParam Map<String, Object> params) {
+        PageUtils page = animalInfoService.canAdoptPage(params);
 
         return R.ok().put("page", page);
     }
@@ -89,15 +102,7 @@ public class AnimalInfoController extends AbstractController {
         dealInstanceService.save(dealInstance);
 
         // 下一步
-        DealInstanceEntity nextStep = new DealInstanceEntity();
-        nextStep.setAnimalId(animalInfo.getId());
-        nextStep.setStatus(0);
-        nextStep.setWorkitem("清洗检查");
-        nextStep.setPreWorkitemId(dealInstance.getId());
-        nextStep.setHandleUrl("animal-animalinfo?id=" + animalInfo.getId());
-        nextStep.setTitle("【清洗检查】" + animalInfo.getName());
-        nextStep.setStartDate(new Date());
-        dealInstanceService.save(nextStep);
+        sendNext(animalInfo, dealInstance, "清洗检查");
 
         return R.ok();
     }
@@ -107,10 +112,23 @@ public class AnimalInfoController extends AbstractController {
      */
     @RequestMapping("/update")
     @RequiresPermissions("animal:animalinfo:update")
+    @Transactional
     public R update(@RequestBody AnimalInfoEntity animalInfo) {
         animalInfoService.updateById(animalInfo);
 
         return R.ok();
+    }
+
+    private void sendNext(@RequestBody AnimalInfoEntity animalInfo, DealInstanceEntity currentStep, String title) {
+        DealInstanceEntity nextStep = new DealInstanceEntity();
+        nextStep.setAnimalId(animalInfo.getId());
+        nextStep.setStatus(0);
+        nextStep.setWorkitem(title);
+        nextStep.setPreWorkitemId(currentStep.getId());
+        nextStep.setHandleUrl("animal-animalinfo?id=" + animalInfo.getId());
+        nextStep.setTitle("【" + title + "】" + animalInfo.getName());
+        nextStep.setStartDate(new Date());
+        dealInstanceService.save(nextStep);
     }
 
     /**
@@ -130,35 +148,26 @@ public class AnimalInfoController extends AbstractController {
      */
     @RequestMapping("/deal")
     @RequiresPermissions("animal:animalinfo:deal")
-    public R deal(@RequestBody DealInstanceEntity dealInstance) {
+    public R deal(@RequestBody AnimalInfoEntity viewEntity) {
         // 1. 更新动物状态
-        AnimalInfoEntity animalInfo = animalInfoService.getById(dealInstance.getAnimalId());
+        AnimalInfoEntity animalInfo = animalInfoService.getById(viewEntity.getId());
         animalInfo.setStatus(animalInfo.getStatus() + 1);
         animalInfoService.updateById(animalInfo);
 
         // 保存处理流程
         // 2. 查找当前动物流程
         final DealInstanceEntity instance = dealInstanceService.getByAnimalId(animalInfo.getId());
-        dealInstance.setId(instance.getId());
         final SysUserEntity sysUser = getUser();
-        dealInstance.setOpDate(new Date());
-        dealInstance.setOpId(getUserId());
-        dealInstance.setOpName(sysUser.getUsername());
-        dealInstance.setStatus(1);
-        dealInstance.setOpDate(new Date());
-        dealInstanceService.updateById(dealInstance);
+        instance.setOpDate(new Date());
+        instance.setOpId(getUserId());
+        instance.setOpName(sysUser.getUsername());
+        instance.setStatus(1);
+        instance.setOpDate(new Date());
+        dealInstanceService.updateById(instance);
         // 3. 判断动物状态是否为2，如果是，则结束，否则新增流程
-        if (animalInfo.getStatus() == 2) {
+        if (!Constant.INT_TWO.equals(animalInfo.getStatus())) {
             // 下一步
-            DealInstanceEntity nextStep = new DealInstanceEntity();
-            nextStep.setAnimalId(animalInfo.getId());
-            nextStep.setStatus(0);
-            nextStep.setWorkitem("防疫除菌");
-            nextStep.setPreWorkitemId(dealInstance.getId());
-            nextStep.setHandleUrl("animal-animalinfo?id=" + animalInfo.getId());
-            nextStep.setTitle("【防疫除菌】" + animalInfo.getName());
-            nextStep.setStartDate(new Date());
-            dealInstanceService.save(nextStep);
+            sendNext(animalInfo, instance,"防疫除菌");
         }
         return R.ok();
     }

@@ -34,14 +34,27 @@
         header-align="center"
         align="center"
         label="动物名称"
-        width="100">
+        width="200">
+      </el-table-column>
+      <el-table-column
+        prop="description"
+        header-align="center"
+        align="center"
+        label="动物简介"
+        :show-overflow-tooltip="true"
+        width="200">
       </el-table-column>
       <el-table-column
         header-align="center"
         align="center"
+        width="140"
         label="图片">
         <template slot-scope="scope">
-          <img v-if="scope.row.imgurl" style="width:120px;height:80px;border:none;" :src="scope.row.imgurl"  alt=""/>
+          <viewer>
+            <img
+              :src="scope.row.imgurl"
+              style="width: 120px;height: 80px; border:none;cursor:pointer">
+          </viewer>
         </template>
       </el-table-column>
       <el-table-column
@@ -49,7 +62,7 @@
         header-align="center"
         align="center"
         label="种类"
-        width="100">
+        width="130">
       </el-table-column>
       <el-table-column
         prop="registerName"
@@ -61,6 +74,7 @@
         prop="registerDate"
         header-align="center"
         align="center"
+        width="180"
         label="登记时间">
       </el-table-column>
       <el-table-column
@@ -68,7 +82,7 @@
         header-align="center"
         align="center"
         label="状态"
-        width="150"
+        width="100"
         :formatter="statusFormatter">
       </el-table-column>
       <el-table-column
@@ -87,9 +101,9 @@
         label="操作">
         <template slot-scope="scope">
           <el-button v-if="isAuth('animal:animalinfo:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button v-if="isAuth('animal:animalinfo:deal')" type="text" size="small" @click="dealHandle(scope.row.id)">处理</el-button>
-          <el-button type="text" size="small" @click="detail(scope.row.id)">查看</el-button>
-          <el-button v-if="isAuth('animal:animalinfo:delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button v-if="isAuth('animal:animalinfo:deal') && scope.row.status !== 2" type="text" size="small" @click="dealHandle(scope.row.id)">处理</el-button>
+          <el-button type="text" size="small" @click="dealLineHandle(scope.row.id)">查看</el-button>
+          <el-button v-if="isAuth('animal:animalinfo:delete') && scope.row.status !== 2" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -104,14 +118,16 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
-    <!-- 弹窗, 新增 / 修改 -->
+    <!-- 弹窗, 处理 -->
     <deal v-if="dealVisible" ref="deal" @refreshDataList="getDataList"></deal>
+    <dealline v-if="deallineVisible" ref="dealline" @refreshDataList="getDataList"></dealline>
   </div>
 </template>
 
 <script>
   import AddOrUpdate from './animalinfo-add-or-update'
   import Deal from './dealinstance-add-or-update'
+  import Dealline from './dealline'
   export default {
     data () {
       return {
@@ -125,12 +141,15 @@
         dataListLoading: false,
         dataListSelections: [],
         addOrUpdateVisible: false,
-        dealVisible: false
+        dealVisible: false,
+        deallineVisible: false,
+        fileList: []
       }
     },
     components: {
       AddOrUpdate,
-      Deal
+      Deal,
+      Dealline
     },
     activated () {
       this.getDataList()
@@ -219,20 +238,28 @@
         })
       },
       statusFormatter (row, column) {
-        if (row.status === '1') {
+        if (row.status === 1) {
           return '已清洗'
-        } else if (row.status === '2') {
+        } else if (row.status === 2) {
           return '已防疫'
         } else {
           return '已登记'
         }
       },
       adoptFormatter (row, column) {
-        if (row.isAdopt === '1') {
+        if (row.isAdopt === 1) {
+          return '领养审核中'
+        } else if (row.isAdopt === 2) {
           return '已领养'
         } else {
           return '未领养'
         }
+      },
+      dealLineHandle (id) {
+        this.deallineVisible = true
+        this.$nextTick(() => {
+          this.$refs.dealline.init(id)
+        })
       }
     }
   }

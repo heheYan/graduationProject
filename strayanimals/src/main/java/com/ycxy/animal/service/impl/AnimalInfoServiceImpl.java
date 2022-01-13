@@ -1,8 +1,13 @@
 package com.ycxy.animal.service.impl;
 
+import com.ycxy.animal.entity.VO.AnimalInfoVO;
+import com.ycxy.animal.entity.VO.UserVO;
 import com.ycxy.common.utils.Constant;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -57,6 +62,26 @@ public class AnimalInfoServiceImpl extends ServiceImpl<AnimalInfoDao, AnimalInfo
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<AnimalInfoVO> analysisByType() {
+        return baseMapper.analysisByType();
+    }
+
+    @Override
+    public AnimalInfoVO animalAdoptionAnalysis() {
+        return baseMapper.animalAdoptionAnalysis();
+    }
+
+    /**
+     * 系统用户分析
+     *
+     * @return
+     */
+    @Override
+    public UserVO userSituation() {
+        return baseMapper.userSituation();
     }
 
 }

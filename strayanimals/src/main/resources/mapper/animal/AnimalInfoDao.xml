@@ -20,5 +20,26 @@
         <result property="adoptDate" column="adopt_date"/>
     </resultMap>
 
+    <select id="analysisByType" resultType="com.ycxy.animal.entity.VO.AnimalInfoVO">
+        select type, typename, count(1) as cnt from animal_info group by type
+    </select>
+    <select id="animalAdoptionAnalysis" resultType="com.ycxy.animal.entity.VO.AnimalInfoVO">
+        select
+        sum(IF(is_adopt = 0, 1, 0))                as 'wly',
+        sum(IF(is_adopt = 1, 1, 0))                as 'shz',
+        sum(IF(is_adopt = 2, 1, 0))                as 'yly',
+        sum(IF(is_adopt = 0 and status = 2, 1, 0)) as 'wait',
+        sum(IF(is_adopt = 0 and status &lt; 2, 1, 0)) as 'cant'
+        from
+        animal_info
+    </select>
+    <select id="userSituation" resultType="com.ycxy.animal.entity.VO.UserVO">
+        select sum(IF(external = 0, 1, 0))     as 'internal',
+               sum(IF(external = 1, 1, 0))     as 'external',
+               sum(IF(adopt_status = 1, 1, 0)) as 'has_adopt',
+               sum(IF(adopt_status = 0, 1, 0)) as 'no_adopt'
+        from sys_user
+    </select>
+
 
 </mapper>

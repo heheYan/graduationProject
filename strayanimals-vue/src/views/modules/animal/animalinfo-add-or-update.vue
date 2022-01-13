@@ -132,6 +132,20 @@ export default {
         }
       })
     },
+    // 菜单树选中
+    typeListTreeCurrentChangeHandle (data, node) {
+      if (data.id === 0) {
+        this.$message.warning('顶级节点不能选择')
+      } else {
+        this.dataForm.type = data.id
+        this.dataForm.typename = data.name
+      }
+    },
+    // 父类树设置当前选中节点
+    typeListTreeSetCurrentNode () {
+      this.$refs.typeListTree.setCurrentKey(this.dataForm.parentId)
+      this.dataForm.parentName = (this.$refs.typeListTree.getCurrentNode() || {})['name']
+    },
     // 表单提交
     dataFormSubmit () {
       this.$refs['dataForm'].validate((valid) => {

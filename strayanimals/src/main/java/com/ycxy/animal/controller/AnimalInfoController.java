@@ -1,16 +1,16 @@
 package com.ycxy.animal.controller;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
 import com.ycxy.animal.entity.DealInstanceEntity;
+import com.ycxy.animal.entity.VO.AnimalInfoVO;
 import com.ycxy.animal.service.DealInstanceService;
 import com.ycxy.common.utils.Constant;
 import com.ycxy.modules.sys.controller.AbstractController;
 import com.ycxy.modules.sys.entity.SysUserEntity;
 import com.ycxy.modules.sys.service.SysUserService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -167,7 +167,7 @@ public class AnimalInfoController extends AbstractController {
         // 3. 判断动物状态是否为2，如果是，则结束，否则新增流程
         if (!Constant.INT_TWO.equals(animalInfo.getStatus())) {
             // 下一步
-            sendNext(animalInfo, instance,"防疫除菌");
+            sendNext(animalInfo, instance, "防疫除菌");
         }
         return R.ok();
     }

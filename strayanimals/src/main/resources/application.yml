@@ -9,8 +9,10 @@ server:
     context-path: /stray-anmial
 upload:
   uploadFolder: /D:/upload/
+  prefix: /stray-anmial/upload/  #必须 / 结尾
     # 对外访问的资源路径
   staticAccessPath: /upload/**
+  server: http://localhost:${server.port}
 spring:
 #   环境 dev|test|prod
   profiles:

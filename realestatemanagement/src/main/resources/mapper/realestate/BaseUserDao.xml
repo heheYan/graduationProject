@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ycxy.realestate.dao.BaseUserDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.ycxy.realestate.entity.BaseUserEntity" id="baseUserMap">
+        <result property="id" column="id"/>
+        <result property="roomId" column="room_id"/>
+        <result property="roomNo" column="room_no"/>
+        <result property="name" column="name"/>
+        <result property="loginid" column="loginid"/>
+        <result property="idcard" column="idcard"/>
+        <result property="mobile" column="mobile"/>
+        <result property="isMaster" column="is_master"/>
+        <result property="isTenantry" column="is_tenantry"/>
+        <result property="enterTime" column="enter_time"/>
+        <result property="outTime" column="out_time"/>
+        <result property="isDelete" column="is_delete"/>
+    </resultMap>
+
+
+</mapper>

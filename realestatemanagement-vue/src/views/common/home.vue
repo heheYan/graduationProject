@@ -322,7 +322,7 @@
   }
 </script>
 
-<style>
+<style scoped>
   .mod-home {
     line-height: 1.5;
   }

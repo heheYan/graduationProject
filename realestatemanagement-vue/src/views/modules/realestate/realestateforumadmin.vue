@@ -71,12 +71,15 @@
       :total="totalPage"
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
+    <!-- 弹窗, 新增 / 修改 -->
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
     <detail v-if="detailVisible" ref="detail" @refreshDataList="getDataList"></detail>
   </div>
 </template>
 
 <script>
 import Detail from './realestateforum-detail'
+import AddOrUpdate from './realestateforum-add-or-update'
 export default {
   data () {
     return {
@@ -89,10 +92,12 @@ export default {
       totalPage: 0,
       dataListLoading: false,
       dataListSelections: [],
+      addOrUpdateVisible: false,
       detailVisible: false
     }
   },
   components: {
+    AddOrUpdate,
     Detail
   },
   activated () {

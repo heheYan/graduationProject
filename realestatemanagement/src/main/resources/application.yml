@@ -39,6 +39,12 @@ spring:
 #  resources:
 #    add-mappings: false
 
+upload:
+  uploadFolder: /D:/upload/
+  prefix: /realestate/upload/  #必须 / 结尾
+  # 对外访问的资源路径
+  staticAccessPath: /upload/**
+  server: http://localhost:${server.port}
 
 #mybatis
 mybatis-plus:

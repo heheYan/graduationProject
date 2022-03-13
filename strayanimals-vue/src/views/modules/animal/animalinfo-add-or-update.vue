@@ -178,6 +178,20 @@ export default {
           })
         }
       })
+    },
+    handleSuccess (data) {
+      if (data && data.code === 0) {
+        this.dataForm.imgurl = data.filepath
+        this.$message.success('上传成功')
+        this.$refs.uploadElement.clearValidate()
+      }
+    },
+    handleExceed (files, fileList) {
+      this.$message.warning('只能选择一张照片')
+    },
+    handleRemove (files, fileList) {
+      this.$message.warning('移除成功')
+      this.dataForm.imgurl = ''
     }
   }
 }

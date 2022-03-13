@@ -61,7 +61,7 @@ mybatis-plus:
     jdbc-type-for-null: 'null'
 
 
-anmial:
+realestate:
   redis:
     open: false
   shiro:
@@ -69,7 +69,7 @@ anmial:
   # APP模块，是通过jwt认证的，如果要使用APP模块，则需要修改【加密秘钥】
   jwt:
     # 加密秘钥
-    secret: f4e2e52034348f86b67cde581c0f9eb5[www.stray-anmial.com]
+    secret: f4e2e52034348f86b67cde581c0f9eb5[www.realestate-management.com]
     # token有效时长，7天，单位秒
     expire: 604800
     header: token

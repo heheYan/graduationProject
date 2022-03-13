@@ -3,7 +3,7 @@
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="120px">
     <el-form-item label="设备编号" prop="no">
       <el-input v-model="dataForm.no" placeholder="设备编号"></el-input>
     </el-form-item>
@@ -11,16 +11,24 @@
       <el-input v-model="dataForm.name" placeholder="设备名称"></el-input>
     </el-form-item>
     <el-form-item label="设备类型" prop="type">
-      <el-input v-model="dataForm.type" placeholder="设备类型"></el-input>
+      <el-select v-model="dataForm.type" filterable clearable placeholder="请选择设备类型">
+        <el-option
+          v-for="item in typeData"
+          :key="item.value"
+          :label="item.name"
+          :value="item.value">
+        </el-option>
+      </el-select>
     </el-form-item>
     <el-form-item label="所属楼栋" prop="buildId">
-      <el-input v-model="dataForm.buildId" placeholder="所属楼栋"></el-input>
-    </el-form-item>
-    <el-form-item label="状态" prop="status">
-      <el-input v-model="dataForm.status" placeholder="状态"></el-input>
-    </el-form-item>
-    <el-form-item label="添加时间" prop="createTime">
-      <el-input v-model="dataForm.createTime" placeholder="添加时间"></el-input>
+      <el-select v-model="dataForm.buildId" filterable clearable placeholder="请选择楼栋">
+        <el-option
+          v-for="item in buildData"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value">
+        </el-option>
+      </el-select>
     </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -40,10 +48,10 @@
           no: '',
           name: '',
           type: '',
-          buildId: '',
-          status: '',
-          createTime: ''
+          buildId: ''
         },
+        buildData: [],
+        typeData: [],
         dataRule: {
           no: [
             { required: true, message: '设备编号不能为空', trigger: 'blur' }
@@ -53,21 +61,16 @@
           ],
           type: [
             { required: true, message: '设备类型不能为空', trigger: 'blur' }
-          ],
-          buildId: [
-            { required: true, message: '所属楼栋不能为空', trigger: 'blur' }
-          ],
-          status: [
-            { required: true, message: '状态不能为空', trigger: 'blur' }
-          ],
-          createTime: [
-            { required: true, message: '添加时间不能为空', trigger: 'blur' }
           ]
         }
       }
     },
     methods: {
       init (id) {
+        // 初始化楼栋选项
+        this.getBuildDataList()
+        // 初始化设备类型
+        this.getTypeList()
         this.dataForm.id = id || 0
         this.visible = true
         this.$nextTick(() => {
@@ -87,6 +90,30 @@
                 this.dataForm.createTime = data.baseFacility.createTime
               }
             })
+          }
+        })
+      },
+      // 获取楼栋数据列表
+      getBuildDataList () {
+        this.$http({
+          url: this.$http.adornUrl('/realestate/basebuild/dropDataList'),
+          method: 'get',
+          params: this.$http.adornParams({})
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.buildData = data.data
+          }
+        })
+      },
+      // 获取楼栋数据列表
+      getTypeList () {
+        this.$http({
+          url: this.$http.adornUrl('/realestate/basefacility/getTypeList'),
+          method: 'get',
+          params: this.$http.adornParams({})
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.typeData = data.typeList
           }
         })
       },

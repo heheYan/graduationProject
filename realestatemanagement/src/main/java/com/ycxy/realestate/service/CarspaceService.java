@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.ycxy.common.utils.PageUtils;
 import com.ycxy.realestate.entity.CarspaceEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,5 +17,6 @@ import java.util.Map;
 public interface CarspaceService extends IService<CarspaceEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
-}
 
+    List<CarspaceEntity> listAll(Map<String, Object> params);
+}

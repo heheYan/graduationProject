@@ -137,7 +137,7 @@
 
 <style scoped>
 .register {
-  width: 80%;
+  width: 40%;
   margin: auto;
 }
 h2 {

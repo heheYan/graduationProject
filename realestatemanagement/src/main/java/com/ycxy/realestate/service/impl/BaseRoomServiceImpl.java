@@ -1,8 +1,10 @@
 package com.ycxy.realestate.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -51,6 +53,11 @@ public class BaseRoomServiceImpl extends ServiceImpl<BaseRoomDao, BaseRoomEntity
         return count(queryWrapper);
     }
 
+    @Override
+    public List<Map<String, Object>> countByBuildIdAndStatus(Long buildId) {
+        return baseMapper.countByBuildId(buildId);
+    }
+
     /**
      * 查询除自己外本楼是否已存在当前房间号
      *
@@ -68,6 +75,18 @@ public class BaseRoomServiceImpl extends ServiceImpl<BaseRoomDao, BaseRoomEntity
             queryWrapper.ne(BaseRoomEntity::getId, id);
         }
         return count(queryWrapper) > 0;
+    }
+
+    @Override
+    public List<String> listBuilds() {
+        return baseMapper.listBuilds();
+    }
+
+    @Override
+    public List<BaseRoomEntity> listByBuildId(Long buildId) {
+        LambdaQueryWrapper<BaseRoomEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(BaseRoomEntity::getBuildId, buildId);
+        return baseMapper.selectList(queryWrapper);
     }
 
 }

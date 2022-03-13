@@ -13,6 +13,10 @@
         <result property="status" column="status"/>
         <result property="createTime" column="create_time"/>
     </resultMap>
+    <select id="countErrorByType" resultType="java.lang.Integer">
+        select count(distinct facility_id) from base_facility a inner join tb_repair tr on a.id = tr.facility_id
+        where a.type = #{type}
+    </select>
 
 
 </mapper>

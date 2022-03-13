@@ -43,7 +43,7 @@
         align="center"
         label="状态">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.status === 0" size="small" type="danger">未出售</el-tag>
+          <el-tag v-if="scope.row.status === 0" size="small" type="danger">未入住</el-tag>
           <el-tag v-else-if="scope.row.status === 1" size="small" type="success">业主入住</el-tag>
           <el-tag v-else="scope.row.status === 2" size="small">租户入住</el-tag>
         </template>
@@ -61,8 +61,8 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button v-if="isAuth('realestate:baseroom:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button v-if="isAuth('realestate:baseroom:delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>

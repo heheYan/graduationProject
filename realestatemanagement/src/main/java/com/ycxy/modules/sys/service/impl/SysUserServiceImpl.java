@@ -76,10 +76,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 		user.setPassword(new Sha256Hash(user.getPassword(), salt).toHex());
 		user.setSalt(salt);
 		this.save(user);
-		
+
 		//检查角色是否越权
 		checkRole(user);
-		
+
 		//保存用户与角色关系
 		sysUserRoleService.saveOrUpdate(user.getUserId(), user.getRoleIdList());
 	}
@@ -93,10 +93,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 			user.setPassword(new Sha256Hash(user.getPassword(), user.getSalt()).toHex());
 		}
 		this.updateById(user);
-		
+
 		//检查角色是否越权
 		checkRole(user);
-		
+
 		//保存用户与角色关系
 		sysUserRoleService.saveOrUpdate(user.getUserId(), user.getRoleIdList());
 	}
@@ -113,7 +113,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 		return this.update(userEntity,
 				new QueryWrapper<SysUserEntity>().eq("user_id", userId).eq("password", password));
 	}
-	
+
+	/**
+	 * 获取维修人员列表
+	 */
+	@Override
+	public List<SysUserEntity> getRepairUserList(String roleName) {
+		return baseMapper.getRepairUserList(roleName);
+	}
+
 	/**
 	 * 检查角色是否越权
 	 */
@@ -125,7 +133,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 		if(user.getCreateUserId() == Constant.SUPER_ADMIN){
 			return ;
 		}
-		
+
 		//查询用户创建的角色列表
 		List<Long> roleIdList = sysRoleService.queryRoleIdList(user.getCreateUserId());
 

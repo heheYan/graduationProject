@@ -24,12 +24,6 @@
         width="50">
       </el-table-column>
       <el-table-column
-        prop="id"
-        header-align="center"
-        align="center"
-        label="主键">
-      </el-table-column>
-      <el-table-column
         prop="no"
         header-align="center"
         align="center"

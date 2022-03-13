@@ -2,12 +2,21 @@
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+        <el-input v-model="dataForm.key" placeholder="报修人" clearable></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-select v-model="dataForm.status" placeholder="请选择工单状态" @change="getDataList">
+          <el-option
+            v-for="item in statusData"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('realestate:repair:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('realestate:repair:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('realestate:repair:save')" type="primary" @click="addOrUpdateHandle()">我要报修</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -17,34 +26,24 @@
       @selection-change="selectionChangeHandle"
       style="width: 100%;">
       <el-table-column
-        type="selection"
-        header-align="center"
-        align="center"
-        width="50">
-      </el-table-column>
-      <el-table-column
-        prop="id"
-        header-align="center"
-        align="center"
-        label="主键">
-      </el-table-column>
-      <el-table-column
-        prop="roomId"
-        header-align="center"
-        align="center"
-        label="房间id">
-      </el-table-column>
-      <el-table-column
-        prop="userId"
-        header-align="center"
-        align="center"
-        label="业主id">
-      </el-table-column>
-      <el-table-column
         prop="userName"
         header-align="center"
         align="center"
         label="业主名称">
+      </el-table-column>
+      <el-table-column
+        prop="roomNo"
+        header-align="center"
+        align="center"
+        label="房间号">
+      </el-table-column>
+      <el-table-column
+        prop="reason"
+        header-align="center"
+        align="center"
+        width="340"
+        :show-overflow-tooltip="true"
+        label="原因">
       </el-table-column>
       <el-table-column
         prop="applyTime"
@@ -53,22 +52,21 @@
         label="报修时间">
       </el-table-column>
       <el-table-column
-        prop="reason"
-        header-align="center"
-        align="center"
-        label="原因">
-      </el-table-column>
-      <el-table-column
         prop="status"
         header-align="center"
         align="center"
         label="处理状态">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.status === 0" size="small" type="danger">待处理</el-tag>
+          <el-tag v-else-if="scope.row.status === 1" size="small" type="warning">已分配</el-tag>
+          <el-tag v-else-if="scope.row.status === 2" size="small" type="success">已处理</el-tag>
+        </template>
       </el-table-column>
       <el-table-column
-        prop="repairId"
+        prop="facilityName"
         header-align="center"
         align="center"
-        label="维修人id">
+        label="公共设施名称">
       </el-table-column>
       <el-table-column
         prop="repairName"
@@ -80,6 +78,7 @@
         prop="remark"
         header-align="center"
         align="center"
+        :show-overflow-tooltip="true"
         label="备注">
       </el-table-column>
       <el-table-column
@@ -92,11 +91,11 @@
         fixed="right"
         header-align="center"
         align="center"
-        width="150"
+        width="100"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button v-if="isAuth('realestate:repair:update') && scope.row.status === 0" type="text" size="small" @click="dealHandle(scope.row.id)">分配维修人员</el-button>
+          <el-button v-if="isAuth('realestate:repair:update') && scope.row.status === 1" type="text" size="small" @click="feedbackHandle(scope.row.id)">维修反馈</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -111,28 +110,57 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <!-- 分配处理人员   -->
+    <deal v-if="dealVisible" ref="repairDeal" @refreshDataList="getDataList"></deal>
+    <!-- 维修人员反馈   -->
+    <feedback v-if="feedbackVisible" ref="repairFeedback" @refreshDataList="getDataList"></feedback>
   </div>
 </template>
 
 <script>
   import AddOrUpdate from './repair-add-or-update'
+  import Deal from './repair-deal'
+  import Feedback from './repair-feedback'
   export default {
     data () {
       return {
         dataForm: {
-          key: ''
+          key: '',
+          status: -1
         },
+        statusData: [
+          {
+            'value': -1,
+            'label': '全部'
+          },
+          {
+            'value': 0,
+            'label': '待分配'
+          },
+          {
+            'value': 1,
+            'label': '已分配'
+          },
+          {
+            'value': 2,
+            'label': '已处理'
+          }
+        ],
         dataList: [],
         pageIndex: 1,
         pageSize: 10,
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        feedbackVisible: false,
+        dealVisible: false
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      Deal,
+      Feedback
     },
     activated () {
       this.getDataList()
@@ -147,7 +175,8 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'key': this.dataForm.key,
+            'status': this.dataForm.status
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -180,6 +209,20 @@
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(id)
+        })
+      },
+      // 分配人员
+      dealHandle (id) {
+        this.dealVisible = true
+        this.$nextTick(() => {
+          this.$refs.repairDeal.init(id)
+        })
+      },
+      // 维修人员反馈处理
+      feedbackHandle (id) {
+        this.feedbackVisible = true
+        this.$nextTick(() => {
+          this.$refs.repairFeedback.init(id)
         })
       },
       // 删除

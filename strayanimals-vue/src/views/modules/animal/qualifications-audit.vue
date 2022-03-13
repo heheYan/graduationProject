@@ -44,7 +44,8 @@ export default {
         mobile: '',
         address: '',
         reason: '',
-        remark: ''
+        remark: '',
+        userId: ''
       },
       visible: false,
       isSubmit: false,
@@ -67,7 +68,7 @@ export default {
     init (id) {
       this.visible = true
       this.$http({
-        url: this.$http.adornUrl('/pualifications/detail'),
+        url: this.$http.adornUrl('/pualifications/detail/' + id),
         method: 'get',
         params: this.$http.adornParams()
       }).then(({data}) => {
@@ -79,6 +80,7 @@ export default {
           this.dataForm.address = data.data.address
           this.dataForm.reason = data.data.reason
           this.dataForm.remark = data.data.remark
+          this.dataForm.userId = data.data.userId
         }
       })
     },
@@ -91,7 +93,8 @@ export default {
             data: this.$http.adornData({
               'id': this.dataForm.id || undefined,
               'remark': this.dataForm.remark,
-              'status': status
+              'status': status,
+              'userId': this.dataForm.userId
             })
           }).then(({data}) => {
             if (data && data.code === 0) {

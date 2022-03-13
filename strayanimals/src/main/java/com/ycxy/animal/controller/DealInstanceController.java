@@ -1,5 +1,6 @@
 package com.ycxy.animal.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,8 @@ public class DealInstanceController extends AbstractController {
             // 首页只展示10条
             page.setCurrPage(0);
             page.setPageSize(10);
+        } else {
+            page = new PageUtils(new ArrayList<>(), 0, 0, 0);
         }
         return R.ok().put("page", page);
     }
@@ -60,6 +63,8 @@ public class DealInstanceController extends AbstractController {
         PageUtils page = null;
         if (sysUserRoleService.isOrganUser(getUserId())) {
             page = dealInstanceService.queryPage(params);
+        } else {
+            page = new PageUtils(new ArrayList<>(), 0, 0, 0);
         }
         return R.ok().put("page", page);
     }

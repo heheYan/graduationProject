@@ -29,11 +29,22 @@ public class RepairEntity implements Serializable {
 	/**
 	 * 房间id
 	 */
+	@JsonSerialize(using = ToStringSerializer.class)
 	private Long roomId;
 	/**
 	 * 业主id
 	 */
+	@JsonSerialize(using = ToStringSerializer.class)
 	private Long userId;
+	/**
+	 * 楼栋id
+	 */
+	@JsonSerialize(using = ToStringSerializer.class)
+	private Long buildId;
+	/**
+	 * 房间号
+	 */
+	private String roomNo;
 	/**
 	 * 业主名称
 	 */
@@ -48,6 +59,7 @@ public class RepairEntity implements Serializable {
 	private String reason;
 	/**
 	 * 处理状态
+	 * 0:待分配，1：已分配待处理，2：已处理
 	 */
 	private Integer status;
 	/**
@@ -58,6 +70,14 @@ public class RepairEntity implements Serializable {
 	 * 维修人名称
 	 */
 	private String repairName;
+	/**
+	 * 设备id
+	 */
+	private Long facilityId;
+	/**
+	 * 设备名称
+	 */
+	private String facilityName;
 	/**
 	 * 备注
 	 */

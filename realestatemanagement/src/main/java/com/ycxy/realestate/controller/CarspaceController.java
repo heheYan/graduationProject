@@ -1,8 +1,12 @@
 package com.ycxy.realestate.controller;
 
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 
+import com.alibaba.fastjson.JSONObject;
+import com.ycxy.common.utils.Constant;
+import com.ycxy.realestate.entity.BaseBuildEntity;
+import com.ycxy.realestate.entity.BaseRoomEntity;
+import com.ycxy.realestate.service.BaseRoomService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +34,8 @@ import com.ycxy.common.utils.R;
 public class CarspaceController {
     @Autowired
     private CarspaceService carspaceService;
+    @Autowired
+    private BaseRoomService baseRoomService;
 
     /**
      * 列表
@@ -40,6 +46,15 @@ public class CarspaceController {
         PageUtils page = carspaceService.queryPage(params);
 
         return R.ok().put("page", page);
+    }
+
+    /**
+     * 列表
+     */
+    @RequestMapping("/listAll")
+    public R listAll(@RequestParam Map<String, Object> params){
+
+        return R.ok().put("list", carspaceService.listAll(params));
     }
 
 
@@ -60,6 +75,11 @@ public class CarspaceController {
     @RequestMapping("/save")
     @RequiresPermissions("realestate:carspace:save")
     public R save(@RequestBody CarspaceEntity carspace){
+        BaseRoomEntity baseRoom = baseRoomService.getById(carspace.getRoomId());
+        carspace.setRoomNo(baseRoom.getNo());
+
+        carspace.setLastChangeTime(new Date());
+
 		carspaceService.save(carspace);
 
         return R.ok();
@@ -71,6 +91,8 @@ public class CarspaceController {
     @RequestMapping("/update")
     @RequiresPermissions("realestate:carspace:update")
     public R update(@RequestBody CarspaceEntity carspace){
+        carspace.setLastChangeTime(new Date());
+
 		carspaceService.updateById(carspace);
 
         return R.ok();
@@ -87,4 +109,36 @@ public class CarspaceController {
         return R.ok();
     }
 
+
+    /**
+     * 快速初始化
+     */
+    @RequestMapping("/quickInit")
+    public R quickInit(@RequestBody JSONObject jsonObject) {
+        // 查询当前已存在的车位数
+        final int count = carspaceService.count();
+        final Date date = new Date();
+        List<CarspaceEntity> batchCarspace = new ArrayList<>();
+        // 从1栋开始，新增若干个
+        int num = jsonObject.getInteger("no");
+        // 如果计数超过9999，取消新增
+        if (count + num > 9999) {
+            return R.error("车位总数超过9999");
+        }
+        for (int i = (count + 1); i <= count + num; i++) {
+            if (i > 9999) {
+                break;
+            }
+            CarspaceEntity carspace = new CarspaceEntity();
+            // 初始化编码
+            carspace.setNo(String.format("P-%04d", i));
+            // 未售状态
+            carspace.setStatus(Constant.INT_ZERO);
+            carspace.setLastChangeTime(date);
+            batchCarspace.add(carspace);
+        }
+        // 批量保存
+        carspaceService.saveBatch(batchCarspace);
+        return R.ok();
+    }
 }

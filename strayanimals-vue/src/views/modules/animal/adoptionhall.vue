@@ -65,6 +65,16 @@
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
+        // 判断账号是否具有领养权限
+        this.$http({
+          url: this.$http.adornUrl('/pualifications/hasAdoptAuthority'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          if (data && data.data) {
+            this.adoptStat = data.data
+          }
+        })
         this.$http({
           url: this.$http.adornUrl('/animal/animalinfo/canAdoptList'),
           method: 'get',
@@ -82,16 +92,6 @@
             this.dataList = []
             this.totalPage = 0
           }
-          // 判断账号是否具有领养权限
-          this.$http({
-            url: this.$http.adornUrl('/pualifications/hasAdoptAuthority'),
-            method: 'get',
-            params: this.$http.adornParams()
-          }).then(({data}) => {
-            if (data && data.data) {
-              this.adoptStat = data.data
-            }
-          })
           this.dataListLoading = false
         })
       },

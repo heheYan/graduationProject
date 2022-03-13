@@ -31,6 +31,9 @@ public class MyAdoptionServiceImpl extends ServiceImpl<MyAdoptionDao, MyAdoption
         if (params.containsKey("userId")) {
             wrapper.eq("user_id", params.get("userId"));
         }
+        if (params.containsKey("id")) {
+            wrapper.eq("animal_id", params.get("id"));
+        }
         wrapper.orderByDesc("apply_date");
         wrapper.orderByAsc("status");
         IPage<MyAdoptionEntity> page = this.page(

@@ -83,7 +83,7 @@
         width="170"
         label="操作">
         <template slot-scope="scope">
-          <el-button v-if="!isDeal" type="text" size="small" @click="dealHandle(scope.row.id,scope.row.animalInfo.id)">处理</el-button>
+          <el-button v-if="!scope.row.isDeal" type="text" size="small" @click="dealHandle(scope.row.id,scope.row.animalInfo.id)">处理</el-button>
           <el-button type="text" size="small" @click="dealLineHandle(scope.row.animalInfo.id)">查看流程</el-button>
         </template>
       </el-table-column>
@@ -140,7 +140,8 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'key': this.dataForm.key,
+            'id': this.$route.query.id
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -166,10 +167,10 @@
       },
       adoptStatusFormatter (row, column) {
         if (row.status === 1) {
-          this.isDeal = true
+          row.isDeal = true
           return '审核通过'
         } else if (row.status === 2) {
-          this.isDeal = true
+          row.isDeal = true
           return '审核未通过'
         } else {
           return '审核中'

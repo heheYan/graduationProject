@@ -145,4 +145,11 @@ public class Constant {
     public static final Integer INT_TWO = 2;
     public static final Integer INT_THREE = 3;
     public static final Integer INT_FOUR = 4;
+
+
+    public static final String STR_ZERO = "0";
+    public static final String STR_ONE = "1";
+    public static final String STR_TWO = "2";
+    public static final String STR_THREE = "3";
+    public static final String STR_FOUR = "4";
 }

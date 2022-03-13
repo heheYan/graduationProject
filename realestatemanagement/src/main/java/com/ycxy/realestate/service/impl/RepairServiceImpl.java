@@ -18,9 +18,18 @@ public class RepairServiceImpl extends ServiceImpl<RepairDao, RepairEntity> impl
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        QueryWrapper<RepairEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.orderByAsc("status");
+        queryWrapper.orderByDesc("apply_time");
+        if (params.get("key") != null) {
+            queryWrapper.like("user_name", params.get("key"));
+        }
+        if (!params.get("status").equals("-1")) {
+            queryWrapper.eq("status", params.get("status"));
+        }
         IPage<RepairEntity> page = this.page(
                 new Query<RepairEntity>().getPage(params),
-                new QueryWrapper<RepairEntity>()
+                queryWrapper
         );
 
         return new PageUtils(page);

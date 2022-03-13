@@ -1,8 +1,6 @@
 package com.ycxy.realestate.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import java.math.BigDecimal;
@@ -34,18 +32,29 @@ public class CarspaceEntity implements Serializable {
 	/**
 	 * 车牌号
 	 */
+	@TableField(updateStrategy = FieldStrategy.IGNORED)
 	private String carNo;
 	/**
 	 * 房间id
 	 */
+	@JsonSerialize(using = ToStringSerializer.class)
+	@TableField(updateStrategy = FieldStrategy.IGNORED)
 	private Long roomId;
+	/**
+	 * 楼栋id
+	 */
+	@JsonSerialize(using = ToStringSerializer.class)
+	@TableField(updateStrategy = FieldStrategy.IGNORED)
+	private Long buildId;
 	/**
 	 * 房间号
 	 */
+	@TableField(updateStrategy = FieldStrategy.IGNORED)
 	private String roomNo;
 	/**
 	 * 金额
 	 */
+	@TableField(updateStrategy = FieldStrategy.IGNORED)
 	private BigDecimal money;
 	/**
 	 * 状态。出租、临时、购买

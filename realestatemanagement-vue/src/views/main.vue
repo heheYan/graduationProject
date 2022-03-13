@@ -82,6 +82,9 @@
             this.loading = false
             this.userId = data.user.userId
             this.userName = data.user.username
+            if (data.user.nickName != null) {
+              this.userName = data.user.nickName
+            }
           }
         })
       }

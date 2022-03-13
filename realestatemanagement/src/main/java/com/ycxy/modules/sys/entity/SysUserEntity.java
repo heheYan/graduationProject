@@ -22,7 +22,7 @@ import java.util.List;
 @TableName("sys_user")
 public class SysUserEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
 	 * 用户ID
 	 */
@@ -62,6 +62,8 @@ public class SysUserEntity implements Serializable {
 	 * 状态  0：禁用   1：正常
 	 */
 	private Integer status;
+
+	private String nickName;
 
 	/**
 	 * 角色ID列表

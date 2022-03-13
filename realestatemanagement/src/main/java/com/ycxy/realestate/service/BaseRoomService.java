@@ -1,9 +1,11 @@
 package com.ycxy.realestate.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ycxy.common.utils.PageUtils;
 import com.ycxy.realestate.entity.BaseRoomEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,6 +25,8 @@ public interface BaseRoomService extends IService<BaseRoomEntity> {
      */
     int countByBuildId(Long buildId);
 
+    List<Map<String, Object>> countByBuildIdAndStatus(Long buildId);
+
     /**
      * 查询除自己外本楼是否已存在当前房间号
      *
@@ -32,4 +36,8 @@ public interface BaseRoomService extends IService<BaseRoomEntity> {
      * @return 是否存在
      */
     boolean isExistByNoAndBuildId(String no, Long buildId, Long id);
+
+    List<String> listBuilds();
+
+    List<BaseRoomEntity> listByBuildId(Long buildId);
 }

@@ -1,21 +1,18 @@
 package com.ycxy.realestate.controller;
 
-import java.util.Arrays;
-import java.util.Map;
-
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.ycxy.realestate.entity.BaseFacilityEntity;
-import com.ycxy.realestate.service.BaseFacilityService;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ycxy.common.utils.PageUtils;
 import com.ycxy.common.utils.R;
+import com.ycxy.realestate.entity.BaseFacilityEntity;
+import com.ycxy.realestate.service.BaseBuildService;
+import com.ycxy.realestate.service.BaseFacilityService;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.*;
 
 
 /**
@@ -31,6 +28,9 @@ public class BaseFacilityController {
     @Autowired
     private BaseFacilityService baseFacilityService;
 
+    @Autowired
+    private BaseBuildService baseBuildService;
+
     /**
      * 列表
      */
@@ -38,7 +38,14 @@ public class BaseFacilityController {
     @RequiresPermissions("realestate:basefacility:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = baseFacilityService.queryPage(params);
-
+        if (page != null && !page.getList().isEmpty()) {
+            page.getList().forEach(obj -> {
+                BaseFacilityEntity baseFacility = (BaseFacilityEntity) obj;
+                if (baseFacility.getBuildId() != null) {
+                    baseFacility.setBuildNo(baseBuildService.getById(baseFacility.getBuildId()).getNo());
+                }
+            });
+        }
         return R.ok().put("page", page);
     }
 
@@ -60,6 +67,9 @@ public class BaseFacilityController {
     @RequestMapping("/save")
     @RequiresPermissions("realestate:basefacility:save")
     public R save(@RequestBody BaseFacilityEntity baseFacility){
+        baseFacility.setCreateTime(new Date());
+        // 正常使用状态
+        baseFacility.setStatus(1);
 		baseFacilityService.save(baseFacility);
 
         return R.ok();
@@ -87,4 +97,30 @@ public class BaseFacilityController {
         return R.ok();
     }
 
+    @RequestMapping("/getTypeList")
+    public R getTypeList() {
+        return R.ok().put("typeList", JSON.parse("[{'name':'电梯','value':'1'}," +
+                "{'name':'路灯','value':'2'}," +
+                "{'name':'健身设施','value':'3'}," +
+                "{'name':'儿童设施','value':'4'}," +
+                "{'name':'大门','value':'5'}]"));
+    }
+
+    @RequestMapping("/dropData")
+    public R dropData() {
+        QueryWrapper<BaseFacilityEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("status", 1);
+        List<JSONObject> rtnList = new ArrayList<>();
+        final List<BaseFacilityEntity> facilityEntityList = baseFacilityService.list(queryWrapper);
+        if (!facilityEntityList.isEmpty()) {
+            facilityEntityList.forEach(baseFacilityEntity -> {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("value", baseFacilityEntity.getId());
+                jsonObject.put("label", baseFacilityEntity.getName() + "-" + baseFacilityEntity.getNo());
+                rtnList.add(jsonObject);
+            });
+        }
+
+        return R.ok().put("data", rtnList);
+    }
 }

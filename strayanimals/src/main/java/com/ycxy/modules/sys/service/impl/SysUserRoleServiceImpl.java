@@ -56,7 +56,7 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleDao, SysUserR
 		wrapper.and(q -> {
 			q.eq(SysUserRoleEntity::getRoleId, 1)
 					.or()
-					.eq(SysUserRoleEntity::getRoleId, 1);
+					.eq(SysUserRoleEntity::getRoleId, 2);
 		});
 		return !baseMapper.selectList(wrapper).isEmpty();
 	}

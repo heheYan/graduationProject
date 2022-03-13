@@ -2,7 +2,7 @@
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+        <el-input v-model="dataForm.key" placeholder="设备名" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
@@ -23,12 +23,6 @@
         width="50">
       </el-table-column>
       <el-table-column
-        prop="id"
-        header-align="center"
-        align="center"
-        label="主键">
-      </el-table-column>
-      <el-table-column
         prop="no"
         header-align="center"
         align="center"
@@ -45,9 +39,16 @@
         header-align="center"
         align="center"
         label="设备类型">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.type === '1'" size="small">电梯</el-tag>
+          <el-tag v-else-if="scope.row.type === '2'" size="small">路灯</el-tag>
+          <el-tag v-else-if="scope.row.type === '3'" size="small">健身设施</el-tag>
+          <el-tag v-else-if="scope.row.type === '4'" size="small">儿童设施</el-tag>
+          <el-tag v-else-if="scope.row.type === '5'" size="small">大门</el-tag>
+        </template>
       </el-table-column>
       <el-table-column
-        prop="buildId"
+        prop="buildNo"
         header-align="center"
         align="center"
         label="所属楼栋">
@@ -57,6 +58,10 @@
         header-align="center"
         align="center"
         label="状态">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.status === 0" size="small" type="danger">故障</el-tag>
+          <el-tag v-else-if="scope.row.status === 1" size="small" type="success">正常</el-tag>
+        </template>
       </el-table-column>
       <el-table-column
         prop="createTime"
@@ -71,8 +76,8 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button v-if="isAuth('realestate:basefacility:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button v-if="isAuth('realestate:basefacility:delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>

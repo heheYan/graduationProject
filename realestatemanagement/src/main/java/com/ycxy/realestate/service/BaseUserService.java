@@ -4,10 +4,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.ycxy.common.utils.PageUtils;
 import com.ycxy.realestate.entity.BaseUserEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *
  *
  * @author Joker
  * @email Student@ycxy.com
@@ -17,4 +18,3 @@ public interface BaseUserService extends IService<BaseUserEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
 }
-

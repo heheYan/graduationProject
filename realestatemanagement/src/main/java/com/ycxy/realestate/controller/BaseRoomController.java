@@ -1,9 +1,8 @@
 package com.ycxy.realestate.controller;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ycxy.common.utils.Constant;
 import com.ycxy.realestate.entity.BaseBuildEntity;
 import com.ycxy.realestate.service.BaseBuildService;
@@ -105,6 +104,33 @@ public class BaseRoomController {
 		baseRoomService.removeByIds(Arrays.asList(ids));
 
         return R.ok();
+    }
+
+    @RequestMapping("/dropData")
+    public R dropData() {
+
+        List<String> buildIds = baseRoomService.listBuilds();
+
+        List<BaseBuildEntity> baseBuildEntities = baseBuildService.listByIds(buildIds);
+
+        List<JSONObject> dropDataList = new ArrayList<>();
+        for (BaseBuildEntity baseBuild : baseBuildEntities) {
+            JSONObject buildJson = new JSONObject();
+            buildJson.put("value", baseBuild.getId());
+            buildJson.put("label", baseBuild.getName());
+            List<JSONObject> childList = new ArrayList<>();
+            List<BaseRoomEntity> baseRoomList = baseRoomService.listByBuildId(baseBuild.getId());
+            for (BaseRoomEntity baseRoom : baseRoomList) {
+                JSONObject child = new JSONObject();
+                child.put("value", baseRoom.getId());
+                child.put("label", baseRoom.getNo());
+                childList.add(child);
+            }
+            buildJson.put("children", childList);
+
+            dropDataList.add(buildJson);
+        }
+        return R.ok().put("data", dropDataList);
     }
 
 }

@@ -20,7 +20,7 @@ import java.util.Map;
 
 
 /**
- * 
+ *
  *
  * @author Student
  * @email Student@ycxy.com
@@ -109,8 +109,10 @@ public class PualificationsController extends AbstractController {
         pualifications.setCheckDate(new Date());
         pualificationsService.updateById(pualifications);
         if (1 == pualifications.getStatus()) {
-            sysUser.setAdoptStatus(1);
-            sysUserService.update(sysUser);
+//            SysUserEntity userEntity = sysUserService.getById(pualifications.getUserId());
+//            userEntity.setAdoptStatus(1);
+//            sysUserService.update(userEntity);
+            sysUserService.updateAdoptStatus(pualifications.getUserId(), 1);
         }
         return R.ok().put("data", "审核成功");
     }

@@ -7,7 +7,7 @@ import com.ycxy.realestate.entity.BaseFacilityEntity;
 import java.util.Map;
 
 /**
- * 
+ *
  *
  * @author Joker
  * @email Student@ycxy.com
@@ -16,5 +16,6 @@ import java.util.Map;
 public interface BaseFacilityService extends IService<BaseFacilityEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
-}
 
+    int countErrorByType(int type);
+}

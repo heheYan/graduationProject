@@ -1,6 +1,7 @@
 package com.ycxy.realestate.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -26,6 +27,10 @@ public class BaseUserEntity implements Serializable {
 	@TableId(type = IdType.ASSIGN_ID)
 	@JsonSerialize(using = ToStringSerializer.class)
 	private Long id;
+	/**
+	 * 楼栋id
+	 */
+	private Long buildId;
 	/**
 	 * 房间id
 	 */
@@ -70,5 +75,7 @@ public class BaseUserEntity implements Serializable {
 	 * 是否删除
 	 */
 	private String isDelete;
+
+	private String buildNo;
 
 }

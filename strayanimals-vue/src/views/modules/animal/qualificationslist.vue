@@ -60,7 +60,7 @@
         width="100"
         label="操作">
         <template slot-scope="scope">
-          <el-button v-if="scope.row.status === 0" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">审核</el-button>
+          <el-button v-if="scope.row.status === 0" type="text" size="small" @click="addOrUpdateHandle(scope.row.userId)">审核</el-button>
           </template>
       </el-table-column>
     </el-table>

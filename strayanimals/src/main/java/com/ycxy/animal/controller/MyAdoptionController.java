@@ -98,7 +98,7 @@ public class MyAdoptionController extends AbstractController {
         dealInstance.setStatus(1);
         dealInstance.setWorkitem("领养申请");
         dealInstance.setPreWorkitemId(0L);
-        dealInstance.setHandleUrl("animal-animalinfo?id=" + animalInfo.getId());
+        dealInstance.setHandleUrl("animal-adoption?id=" + animalInfo.getId());
         dealInstance.setTitle("【领养申请】" + animalInfo.getName());
         dealInstance.setStartDate(new Date());
         dealInstance.setOpDate(new Date());
@@ -146,7 +146,7 @@ public class MyAdoptionController extends AbstractController {
         nextStep.setStatus(0);
         nextStep.setWorkitem(title);
         nextStep.setPreWorkitemId(currentStep.getId());
-        nextStep.setHandleUrl("animal-animalinfo?id=" + animalInfo.getId());
+        nextStep.setHandleUrl("animal-adoption?id=" + animalInfo.getId());
         nextStep.setTitle("【" + title + "】" + animalInfo.getName());
         nextStep.setStartDate(new Date());
         dealInstanceService.save(nextStep);

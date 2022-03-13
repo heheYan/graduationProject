@@ -7,7 +7,7 @@
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('realestate:baseuser:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('realestate:baseuser:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('realestate:baseuser:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量搬离</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -23,58 +23,50 @@
         width="50">
       </el-table-column>
       <el-table-column
-        prop="id"
+        prop="buildNo"
         header-align="center"
         align="center"
-        label="主键">
-      </el-table-column>
-      <el-table-column
-        prop="roomId"
-        header-align="center"
-        align="center"
-        label="房间id">
+        width="90"
+        label="楼栋">
       </el-table-column>
       <el-table-column
         prop="roomNo"
         header-align="center"
         align="center"
+        width="90"
         label="房间号">
       </el-table-column>
       <el-table-column
         prop="name"
         header-align="center"
         align="center"
+        width="120"
         label="姓名">
-      </el-table-column>
-      <el-table-column
-        prop="loginid"
-        header-align="center"
-        align="center"
-        label="登录名">
       </el-table-column>
       <el-table-column
         prop="idcard"
         header-align="center"
         align="center"
+        width="180"
         label="身份证号">
       </el-table-column>
       <el-table-column
         prop="mobile"
         header-align="center"
         align="center"
+        width="140"
         label="手机号">
       </el-table-column>
       <el-table-column
         prop="isMaster"
         header-align="center"
         align="center"
+        width="90"
         label="是否户主">
-      </el-table-column>
-      <el-table-column
-        prop="isTenantry"
-        header-align="center"
-        align="center"
-        label="是否租户">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.isMaster === 0" size="small" type="danger">否</el-tag>
+          <el-tag v-else-if="scope.row.isMaster === 1" size="small" type="success">是</el-tag>
+        </template>
       </el-table-column>
       <el-table-column
         prop="enterTime"
@@ -83,16 +75,21 @@
         label="入住时间">
       </el-table-column>
       <el-table-column
+        prop="isDelete"
+        header-align="center"
+        align="center"
+        width="90"
+        label="是否搬离">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.isDelete === '1'" size="small" type="danger">是</el-tag>
+          <el-tag v-else-if="scope.row.isDelete === '0'" size="small" type="success">否</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column
         prop="outTime"
         header-align="center"
         align="center"
         label="离开时间">
-      </el-table-column>
-      <el-table-column
-        prop="isDelete"
-        header-align="center"
-        align="center"
-        label="是否删除">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -101,8 +98,8 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button v-if="isAuth('realestate:baseuser:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button v-if="isAuth('realestate:baseuser:delete') && scope.row.isDelete === '0'" type="text" size="small" @click="deleteHandle(scope.row.id)">搬离</el-button>
         </template>
       </el-table-column>
     </el-table>
